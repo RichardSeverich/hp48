@@ -1,0 +1,130 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:2.5.0"
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
+
+allprojects {
+    group 'org.fundacionjala.prog102'
+    version '1.0-SNAPSHOT'
+
+    apply plugin: 'gradle-one-jar'
+
+    task oneJar(type: OneJar) {
+        mainClass = 'org.fundacionjala.at04.jrpnhp48.app.JRpnHp48Application'
+        archiveName = 'JRPNHP48.jar'
+    }
+
+    artifacts {
+        archives oneJar
+    }
+
+    task copyJar(type: Copy) {
+        from 'jrpn-hp48-app/build/libs'
+        into 'build/JRPNHP48'
+        include 'JRPNHP48.jar'
+    }
+
+    task copyResources(type: Copy) {
+        from 'resources'
+        into 'build/JRPNHP48/resources'
+    }
+}
+
+subprojects {
+    repositories {
+        jcenter()
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'findbugs'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    ext {
+        JUNIT_VERSION = '4.12'
+    }
+
+    dependencies {
+        compile group: 'junit', name: 'junit', version: '4.12'
+        testCompile "junit:junit:${JUNIT_VERSION}"
+        testRuntime "org.slf4j:slf4j-api:1.7.10"
+    }
+
+    checkstyle {
+        toolVersion = '7.7'
+        configFile = file("${rootProject.rootDir}/config/checkstyle/google_checks.xml")
+    }
+
+    findbugs {
+        toolVersion = "3.0.1"
+    }
+
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    pmd {
+        toolVersion = '5.6.1'
+    }
+
+    tasks.withType(Pmd) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    test {
+        testLogging {
+            events "PASSED", "STARTED", "FAILED", "SKIPPED"
+        }
+    }
+}
+
+project(':jrpn-hp48-models') {
+    apply plugin: 'net.saliman.cobertura'
+
+    cobertura {
+        coverageFormats = ['html', 'xml']
+        coverageIgnoreTrivial = true
+        coverageIgnores = ['org.slf4j.Logger.*']
+        coverageReportDir = new File("$buildDir/reports/cobertura")
+        coverageCheckBranchRate = 80
+        coverageCheckLineRate = 80
+        coverageCheckTotalBranchRate = 80
+        coverageCheckTotalLineRate = 80
+        coverageIgnoreTrivial = true
+    }
+
+    test.finalizedBy(project.tasks.cobertura)
+}
+
+project(':jrpn-hp48-core') {
+    apply plugin: 'net.saliman.cobertura'
+
+    cobertura {
+        coverageFormats = ['html', 'xml']
+        coverageIgnoreTrivial = true
+        coverageIgnores = ['org.slf4j.Logger.*']
+        coverageReportDir = new File("$buildDir/reports/cobertura")
+        coverageCheckBranchRate = 80
+        coverageCheckLineRate = 80
+        coverageCheckTotalBranchRate = 80
+        coverageCheckTotalLineRate = 80
+        coverageIgnoreTrivial = true
+    }
+
+    test.finalizedBy(project.tasks.cobertura)
+}

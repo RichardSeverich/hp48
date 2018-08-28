@@ -1,0 +1,7 @@
+rootProject.name = 'jrpn-hp48'
+
+include 'jrpn-hp48-app'
+include 'jrpn-hp48-core'
+include 'jrpn-hp48-models'
+include 'jrpn-hp48-controllers'
+include 'jrpn-hp48-views'

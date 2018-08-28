@@ -1,0 +1,40 @@
+image: java:8
+
+before_script:
+  - wget http://services.gradle.org/distributions/gradle-3.5-bin.zip
+  - unzip gradle-3.5-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-3.5
+  - export PATH=$GRADLE_HOME/bin:$PATH
+
+stages:
+  - check
+  - build
+  - test
+  - deploy
+
+check:
+  stage: check
+  script:
+    - gradle check
+
+build:
+  stage: build
+  script:
+    - gradle build
+
+test:
+  stage: test
+  script:
+    - gradle test
+    - gradle cobertura
+
+deploy:
+  stage: deploy
+  script:
+    - gradle oneJar
+    - gradle copyJar
+    - gradle copyResources
+  artifacts:
+    paths:
+      - build/JRPNHP48/*
+    expire_in: 1 week
